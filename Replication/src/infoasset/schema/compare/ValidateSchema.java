@@ -3,14 +3,32 @@ package infoasset.schema.compare;
 import java.io.File;
 import java.nio.file.*;
 
-import infoasset.schema.MasicSchema;
-import infoasset.schema.SchemaCompiler;
+import infoasset.schema.*;
 
 public class ValidateSchema {
+	
+	// Schema
+	MasicSchema msSch_Prod = null;
+	MasicSchema msSch_Dev = null;
+			
+	// Table 
+	MasicTable msTb_Prod = null;
+	MasicTable msTb_Dev = null;
+			
+	// Field
+	MasicField msField_Prod = null;
+	MasicField msField_Dev = null;
+			
+	// Data Type 
+	MasicFieldType msFieldType_Prod = null;
+	MasicFieldType msFieldType_Dev = null;
+			
+	// Primary Key
+	MasicKey msKey_Prod = null;
+	MasicKey msKey_Dev = null;
 
 	public ValidateSchema(String prod, String dev) throws Exception{
 		// TODO Auto-generated constructor stub
-		Path path = null;
 		Path path_prod = Paths.get(prod);
 		Path path_dev = Paths.get(dev);
 		Path filename_prod = path_prod.getFileName();
@@ -19,56 +37,79 @@ public class ValidateSchema {
 		File file_prod = path_prod.toFile();
 		File file_dev = path_dev.toFile();
 		
-		isSameFileName(filename_prod, filename_dev);
+		System.out.println("Path to schema production : " + path_prod);
+		System.out.println("Path to schema develop : " + path_dev);
 		
-		
-		/*
-		
-		for(String str : prod) {
-			path = Paths.get(str);
+		while(true) {
 			
-			System.out.println("isFilesExists : Prod");
-			if(isFilesExists(path) == false) {
-				System.out.println("Not Found : " + str);
+			// Check File Exists 
+			if (isFilesExists(path_prod)) 
+			{
+				System.out.println("File Exists : " + path_prod);
+			}else {
+				System.out.println("Not Found Schema Production : " + filename_prod);
+				break;
 			}
 			
-			System.out.println("isExtensionSch : Prod");
-			if(isExtensionSch(path) == false) {
-				System.out.println("Not Schema :" + str);
+			if (isFilesExists(path_dev)) 
+			{
+				System.out.println("File Exists : " + path_dev);
+			}else {
+				System.out.println("Not Found Schema Develop : " + filename_dev);
+				break;
 			}
 			
+			// Check Extension .sch
+			if (isExtensionSch(path_prod)) 
+			{
+				System.out.println("Schema Production is extension .sch : " + path_prod);
+			}else {
+				System.out.println("Not Extension .sch : " + filename_prod);
+				break;
+			}
+			
+			if (isExtensionSch(path_dev)) 
+			{
+				System.out.println("Schema Develop is extension .sch : " + path_dev);
+			}else {
+				System.out.println("Not Extension .sch : " + filename_dev);
+				break;
+			}
+			
+			if(isSameFileName(filename_prod, filename_dev)) {
+				System.out.println("Schema same name ");
+			}else {
+				System.out.println("Schema name different");
+				break;
+			}
+			
+			System.out.println("Go to Check Change Structure");
+			checkChangeStructure(file_prod, file_dev);
+			
+			System.out.println("-- Finish Program --");
+			break;
 		}
+	}
+	
+	void checkChangeStructure(File file_prod, File file_dev) throws Exception{
 		
-		for(String str : dev) { 
-			path = Paths.get(str);
-			
-			System.out.println("isFilesExists : Dev");
-			if(isFilesExists(path) == false) {
-				System.out.println("Not Found : " + str);
-			}
-			
-			System.out.println("isExtensionSch : Dev");
-			if(isExtensionSch(path) == false) {
-				System.out.println("Not Schema :" + str);
-			}
-		}
+		System.out.println("== Schema Name : " + msSch_Prod.getSchemaName());
 		
-		for(String str_prod : prod) {
-			for(String str_dev : dev) {
-				path_prod = Paths.get(str_prod);
-				path_dev = Paths.get(str_dev);
-				filename_prod = path_prod.getFileName();
-				filename_dev = path_dev.getFileName();
-				
-				file_prod = path_prod.toFile();
-				file_dev = path_dev.toFile();
-				
-				if(filename_prod.equals(filename_dev)) 
-					checkChangeStructure(file_prod, file_dev);
-			}
-		}
+		int tableCount_Prod = msSch_Prod.getTableCount();
+		int tableCount_Dev = msSch_Dev.getTableCount();
 		
-		*/
+	}
+	
+	void equal() {
+		
+	}
+	
+	void less() {
+		
+	}
+	
+	void more() {
+		
 	}
 	
 	boolean isSameFileName(Path filename_prod, Path filename_dev) {
@@ -87,16 +128,6 @@ public class ValidateSchema {
 		boolean pathSch = false;
 		pathSch = path.toString().endsWith(".sch");
 		return pathSch;
-	}
-	
-	void checkChangeStructure(File file_prod, File file_dev) throws Exception{
-		MasicSchema msSch_Prod = SchemaCompiler.getSchema(file_prod);
-		MasicSchema msSch_Dev = SchemaCompiler.getSchema(file_dev);
-		
-		int tableCount_Prod = msSch_Prod.getTableCount();
-		int tableCount_Dev = msSch_Dev.getTableCount();
-		
-		
 	}
 	
 }

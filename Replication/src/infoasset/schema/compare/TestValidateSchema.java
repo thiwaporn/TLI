@@ -10,7 +10,7 @@ public class TestValidateSchema {
 		String path_prod = "";
 		String path_dev = "";
 		
-		System.out.print(OS);
+		System.out.println(OS);
 		
 		if (isWindows()) {
 			System.out.println("This is Windows");
@@ -26,9 +26,6 @@ public class TestValidateSchema {
 			
 			path_prod = "/Users/view_thiwaporn/git/TLI/sch_prod/csc.sch";
 			path_dev = "/Users/view_thiwaporn/git/TLI/sch_dev/csc.sch";
-			
-			System.out.println(path_prod);
-			System.out.println(path_dev);
 			
 		} else if (isUnix()) {
 			System.out.println("This is Unix or Linux");
