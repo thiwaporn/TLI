@@ -26,6 +26,10 @@ public class ValidateSchema {
 	// Primary Key
 	MasicKey msKey_Prod = null;
 	MasicKey msKey_Dev = null;
+	
+	// Table Count
+	int tableCount_Prod = 0;
+	int tableCount_Dev = 0;
 
 	public ValidateSchema(String prod, String dev) throws Exception{
 		// TODO Auto-generated constructor stub
@@ -84,32 +88,36 @@ public class ValidateSchema {
 			}
 			
 			System.out.println("Go to Check Change Structure");
-			checkChangeStructure(file_prod, file_dev);
+			checkChangeStructureProduction(file_prod, file_dev);
+			checkChangeStructureDevelop(file_prod, file_dev);
 			
 			System.out.println("-- Finish Program --");
 			break;
 		}
 	}
 	
-	void checkChangeStructure(File file_prod, File file_dev) throws Exception{
+	void checkChangeStructureProduction(File file_prod, File file_dev) throws Exception{
+		msSch_Prod = SchemaCompiler.getSchema(file_prod);
+		msSch_Dev = SchemaCompiler.getSchema(file_dev);
 		
-		System.out.println("== Schema Name : " + msSch_Prod.getSchemaName());
+		tableCount_Prod = msSch_Prod.getTableCount();
 		
-		int tableCount_Prod = msSch_Prod.getTableCount();
-		int tableCount_Dev = msSch_Dev.getTableCount();
-		
+		for(int i = 0 ; i < tableCount_Prod ; i++) {
+			msTb_Prod = msSch_Prod.getTableAt(i);
+			msTb_Dev = msSch_Dev.getTableByPath(msTb_Prod.getTablePath());
+			
+		}
 	}
 	
-	void equal() {
+	void checkChangeStructureDevelop(File file_prod, File file_dev) throws Exception{
+		msSch_Prod = SchemaCompiler.getSchema(file_prod);
+		msSch_Dev = SchemaCompiler.getSchema(file_dev);
 		
-	}
-	
-	void less() {
+		tableCount_Dev = msSch_Dev.getTableCount();
 		
-	}
-	
-	void more() {
-		
+		for(int i = 0 ; i < tableCount_Dev ; i++) {
+			
+		}
 	}
 	
 	boolean isSameFileName(Path filename_prod, Path filename_dev) {
