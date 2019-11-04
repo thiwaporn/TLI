@@ -8,22 +8,21 @@ import infoasset.schema.SchemaCompiler;
 
 public class ValidateSchema {
 
-	public ValidateSchema(String[] prod, String[] dev) throws Exception{
+	public ValidateSchema(String prod, String dev) throws Exception{
 		// TODO Auto-generated constructor stub
 		Path path = null;
-		Path path_prod = null;
-		Path path_dev = null;
-		Path filename_prod = null;
-		Path filename_dev = null;
+		Path path_prod = Paths.get(prod);
+		Path path_dev = Paths.get(dev);
+		Path filename_prod = path_prod.getFileName();
+		Path filename_dev = path_dev.getFileName();
 		
-		File file_prod = null;
-		File file_dev = null;
+		File file_prod = path_prod.toFile();
+		File file_dev = path_dev.toFile();
 		
-		int amt_prod = prod.length;
-		int amt_dev = dev.length;
+		isSameFileName(filename_prod, filename_dev);
 		
-		System.out.println("Amount schema prod : " + amt_prod);
-		System.out.println("Amount schema dev : " + amt_dev);
+		
+		/*
 		
 		for(String str : prod) {
 			path = Paths.get(str);
@@ -68,8 +67,15 @@ public class ValidateSchema {
 					checkChangeStructure(file_prod, file_dev);
 			}
 		}
+		
+		*/
 	}
 	
+	boolean isSameFileName(Path filename_prod, Path filename_dev) {
+		boolean isSameFileName = false;
+		isSameFileName = filename_prod.equals(filename_dev);
+		return isSameFileName;
+	}
 	
 	boolean isFilesExists(Path path) {
 		boolean pathExists = false;
