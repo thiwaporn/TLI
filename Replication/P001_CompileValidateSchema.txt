@@ -1,0 +1,12 @@
+-- Source --
+cd /Users/view_thiwaporn/git/TLI/Replication/src/infoasset/schema/compare
+javac TestValidateSchema.java -d /Users/view_thiwaporn/git/TLI/Replication/bin/infoasset/schema/compare
+
+javac TestValidateSchema.java 
+javac ValidateSchema.java 
+
+mv TestValidateSchema.class /Users/view_thiwaporn/git/TLI/Replication/bin/infoasset/schema/compare
+mv ValidateSchema.class /Users/view_thiwaporn/git/TLI/Replication/bin/infoasset/schema/compare
+
+-- Binary --
+cd /Users/view_thiwaporn/git/TLI/Replication/bin/infoasset/schema/compare
