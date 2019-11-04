@@ -1,0 +1,9 @@
+Library Related
+- commons-dbcp
+- commons-io
+- commons-lang3
+- javax.mail
+- log4j-api
+- mania
+- utilitydb
+- utility mail
