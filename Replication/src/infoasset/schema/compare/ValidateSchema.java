@@ -106,6 +106,9 @@ public class ValidateSchema {
 			msTb_Prod = msSch_Prod.getTableAt(i);
 			msTb_Dev = msSch_Dev.getTableByPath(msTb_Prod.getTablePath());
 			
+			// ADD TABLE
+			if(msTb_Dev == null) System.out.println("ADD TABLE : " + msTb_Prod.getTableName());
+			
 		}
 	}
 	
@@ -116,7 +119,11 @@ public class ValidateSchema {
 		tableCount_Dev = msSch_Dev.getTableCount();
 		
 		for(int i = 0 ; i < tableCount_Dev ; i++) {
+			msTb_Dev = msSch_Dev.getTableAt(i);
+			msTb_Prod = msSch_Prod.getTableByPath(msTb_Dev.getTablePath());
 			
+			// DROP TABLE
+			if(msTb_Prod == null) System.out.println("DROP TABLE : " + msTb_Dev.getTableName());
 		}
 	}
 	
