@@ -1,12 +1,21 @@
 package infoasset.schema.compare;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import infoasset.schema.*;
 
 public class ValidateSchema {
+	
+	private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
+	
+	String destPathCSV = "";
+	String filenameCSV = "";
+	String path_to_csv = "";
+	String title = "OPERATION|TABLE/FIELD|SCHEMA NAME|TABLE NAME|PATH TABLE|FIELD NAME|DATA TYPE|LENGTH|SCALE|COMMENT";
 	
 	boolean isExportCSV = true;
 	
@@ -56,7 +65,7 @@ public class ValidateSchema {
 	// Export CSV
 	ArrayList<String> dataList = new ArrayList<String>();
 	
-	public ValidateSchema(String prod, String dev, boolean isCSV) throws Exception{
+	public ValidateSchema(String prod, String dev, boolean isCSV, String destPathCSV) throws Exception{
 		// TODO Auto-generated constructor stub
 		Path path_prod = Paths.get(prod);
 		Path path_dev = Paths.get(dev);
@@ -115,6 +124,22 @@ public class ValidateSchema {
 			System.out.println("-- Let's go to Check Change Structure --");
 			checkChangeStructureProduction(file_prod, file_dev);
 			checkChangeStructureDevelop(file_prod, file_dev);
+			getData();
+			
+			if(isCSV == true && destPathCSV != "") {
+				LocalDateTime now = LocalDateTime.now();
+				filenameCSV = msSch_Dev.getSchemaName() + "_" + dtf.format(now) + ".csv";
+				path_to_csv = destPathCSV + "/" + filenameCSV;
+				
+				if(writeFile()) {
+					
+					System.out.println("Write CSV File : " + path_to_csv); // เติมชื่อไฟล์
+				}else {
+					System.out.println("Unsuccessful write CSV File");
+				}
+			}else if(isCSV == true && destPathCSV == "") {
+				System.out.println("-- Please specific destination CSV File --");
+			}
 			
 			System.out.println("-- Finish Program --");
 			break;
@@ -141,7 +166,7 @@ public class ValidateSchema {
 						msTb_Prod.getTablePath(),
 						msTb_Prod.getComment()};
 				
-				System.out.println(textTablePattern(data));
+				dataList.add(textTablePattern(data));
 				
 				for(int f = 0 ; f < fieldCount_Prod ; f++) {
 					msField_Prod = msTb_Prod.getFieldAt(f);
@@ -161,8 +186,8 @@ public class ValidateSchema {
 						msFieldLength_Prod,
 						msFieldScale_Prod,
 						msFieldComment_Prod};
-						
-					System.out.println(textFieldPattern(data));
+					
+					dataList.add(textFieldPattern(data));
 					
 				}
 			}
@@ -215,7 +240,7 @@ public class ValidateSchema {
 						msTb_Dev.getTablePath(),
 						msTb_Dev.getComment()};
 				
-				System.out.println(textTablePattern(data));
+				dataList.add(textTablePattern(data));
 				
 				for(int f = 0 ; f < fieldCount_Dev ; f++) {
 					msField_Dev = msTb_Dev.getFieldAt(f);
@@ -236,8 +261,8 @@ public class ValidateSchema {
 								msFieldLength_Dev,
 								msFieldScale_Dev,
 								msFieldComment_Dev};
-							
-						System.out.println(textFieldPattern(data));
+					
+						dataList.add(textFieldPattern(data));
 					}
 				}
 			} 
@@ -251,7 +276,7 @@ public class ValidateSchema {
 							msTb_Dev.getTablePath(),
 							msTb_Dev.getComment()};
 					
-					System.out.println(textTablePattern(data));
+					dataList.add(textTablePattern(data));
 				}
 				
 				for(int f = 0 ; f < fieldCount_Dev ; f++) {
@@ -274,8 +299,8 @@ public class ValidateSchema {
 								msFieldLength_Dev,
 								msFieldScale_Dev,
 								msFieldComment_Dev};
-							
-						System.out.println(textFieldPattern(data));
+						
+						dataList.add(textFieldPattern(data));
 					}
 						
 					//ALTER FIELD
@@ -300,7 +325,7 @@ public class ValidateSchema {
 									msFieldScale_Dev,
 									msFieldComment_Dev};
 								
-							System.out.println(textFieldPattern(data));
+							dataList.add(textFieldPattern(data));
 						}
 					}
 				}
@@ -379,19 +404,31 @@ public class ValidateSchema {
 		return pattern;
 	}
 	
-	boolean exportData() {
+	boolean writeFile() throws Exception{
 		boolean isWrite = false;
+		File file = new File(path_to_csv); 
+		FileWriter write = new FileWriter(file, false);
 		
+		write.write(title + "\n");
 		for(String data : dataList) {
-			System.out.println(data);
+			write.write(data + "\n");
 		}
+		write.close();
+		isWrite = true;
 		
 		return isWrite;
 	}
 	
 	void getData() {
-			for(String data : dataList) {
-				System.out.println(data);
+		int dataCount = 0;
+		dataCount = dataList.size();
+			if(dataCount > 0) {
+				System.out.println(title);
+				for(String data : dataList) {
+					System.out.println(data);
+				}
+			}else {
+				System.out.println("-- Not Change Structure Schema --");
 			}
 	}
 	
@@ -440,5 +477,4 @@ public class ValidateSchema {
 		pathSch = path.toString().endsWith(".sch");
 		return pathSch;
 	}
-	
 }
