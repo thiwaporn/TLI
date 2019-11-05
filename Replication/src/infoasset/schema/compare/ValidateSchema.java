@@ -192,45 +192,18 @@ public class ValidateSchema {
 						msTb_Dev.getComment()};
 				
 				System.out.println(textTablePattern(data));
-			} 
 				
-			for(int f = 0 ; f < fieldCount_Dev ; f++) {
-				msField_Dev = msTb_Dev.getFieldAt(f);
-				msField_Prod = msTb_Prod.getField(msField_Dev.getFieldName());
-					
-				msFieldType_Dev = msField_Dev.getType();
-				msFieldLength_Dev = convertIntegerToString(msField_Dev.getLength());
-				msFieldScale_Dev = convertIntegerToString(msField_Dev.getScale());
-				msFieldComment_Dev = msField_Dev.getComment();
-					
-				// ADD FIELD
-				if(msField_Prod == null) {
-					data = new String[] {"ADD",
-							msSch_Dev.getSchemaName(),
-							msTb_Dev.getTableName(),
-							msTb_Dev.getTablePath(),
-							msField_Dev.getFieldName(),
-							msFieldType_Dev.name(),
-							msFieldLength_Dev,
-							msFieldScale_Dev,
-							msFieldComment_Dev};
+				for(int f = 0 ; f < fieldCount_Dev ; f++) {
+					msField_Dev = msTb_Dev.getFieldAt(f);
 						
-					System.out.println(textFieldPattern(data));
-				}
-					
-				//ALTER FIELD
-				if(msField_Prod != null) {
-					
-					msFieldType_Prod = msField_Prod.getType();
-					msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
-					msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
-					msFieldComment_Prod = msField_Prod.getComment();
+					msFieldType_Dev = msField_Dev.getType();
+					msFieldLength_Dev = convertIntegerToString(msField_Dev.getLength());
+					msFieldScale_Dev = convertIntegerToString(msField_Dev.getScale());
+					msFieldComment_Dev = msField_Dev.getComment();
 						
-					if(isSameFieldType(msFieldType_Prod.name(), msFieldType_Dev.name()) == false || 
-					   isSameFieldLength(msFieldLength_Prod, msFieldLength_Dev) == false || 
-					   isSameFieldScale(msFieldScale_Prod, msFieldScale_Dev) == false) {
-							
-						data = new String[] {"ALTER",
+					// ADD FIELD
+					if(msField_Dev != null) {
+						data = new String[] {"ADD",
 								msSch_Dev.getSchemaName(),
 								msTb_Dev.getTableName(),
 								msTb_Dev.getTablePath(),
@@ -241,6 +214,70 @@ public class ValidateSchema {
 								msFieldComment_Dev};
 							
 						System.out.println(textFieldPattern(data));
+					}
+				}
+			} 
+			
+			if(msTb_Prod != null) {
+				// RENAME TABLE
+				if(isSameTableName(msTb_Prod.getTableName(), msTb_Dev.getTableName()) == false) {
+					data = new String[] {"RENAME",
+							msSch_Dev.getSchemaName(),
+							msTb_Dev.getTableName(),
+							msTb_Dev.getTablePath(),
+							msTb_Dev.getComment()};
+					
+					System.out.println(textTablePattern(data));
+				}
+				
+				for(int f = 0 ; f < fieldCount_Dev ; f++) {
+					msField_Dev = msTb_Dev.getFieldAt(f);
+					msField_Prod = msTb_Prod.getField(msField_Dev.getFieldName());
+						
+					msFieldType_Dev = msField_Dev.getType();
+					msFieldLength_Dev = convertIntegerToString(msField_Dev.getLength());
+					msFieldScale_Dev = convertIntegerToString(msField_Dev.getScale());
+					msFieldComment_Dev = msField_Dev.getComment();
+						
+					// ADD FIELD
+					if(msField_Prod == null) {
+						data = new String[] {"ADD",
+								msSch_Dev.getSchemaName(),
+								msTb_Dev.getTableName(),
+								msTb_Dev.getTablePath(),
+								msField_Dev.getFieldName(),
+								msFieldType_Dev.name(),
+								msFieldLength_Dev,
+								msFieldScale_Dev,
+								msFieldComment_Dev};
+							
+						System.out.println(textFieldPattern(data));
+					}
+						
+					//ALTER FIELD
+					if(msField_Prod != null) {
+						
+						msFieldType_Prod = msField_Prod.getType();
+						msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
+						msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
+						msFieldComment_Prod = msField_Prod.getComment();
+							
+						if(isSameFieldType(msFieldType_Prod.name(), msFieldType_Dev.name()) == false || 
+						   isSameFieldLength(msFieldLength_Prod, msFieldLength_Dev) == false || 
+						   isSameFieldScale(msFieldScale_Prod, msFieldScale_Dev) == false) {
+								
+							data = new String[] {"ALTER",
+									msSch_Dev.getSchemaName(),
+									msTb_Dev.getTableName(),
+									msTb_Dev.getTablePath(),
+									msField_Dev.getFieldName(),
+									msFieldType_Dev.name(),
+									msFieldLength_Dev,
+									msFieldScale_Dev,
+									msFieldComment_Dev};
+								
+							System.out.println(textFieldPattern(data));
+						}
 					}
 				}
 			}
@@ -262,12 +299,15 @@ public class ValidateSchema {
 		tablePath = data[3];
 		comment = data[4];
 		
-		// Pattern : ADD/DROP TABLE | SCHEMA_NAME | TABLE_NAME | PATH_TABLE|  |  |  |  | COMMENT
+		// Pattern : ADD/DROP/RENAME TABLE | SCHEMA_NAME | TABLE_NAME | PATH_TABLE|  |  |  |  | COMMENT
 		if(operType.equals("ADD")) {
 			pattern = "ADD TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
 					" " + "|" + " " + "|" + " " + "|" + comment;
 		}else if(operType.equals("DROP")) {
 			pattern = "DROP TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
+					" " + "|" + " " + "|" + " " + "|" + comment;
+		}else if(operType.equals("RENAME")) {
+			pattern = "RENAME TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
 					" " + "|" + " " + "|" + " " + "|" + comment;
 		}
 		
@@ -335,6 +375,12 @@ public class ValidateSchema {
 		boolean isSameFieldScale = false;
 		isSameFieldScale = fieldScale_Prod.equals(fieldScale_Dev);
 		return isSameFieldScale;
+	}
+	
+	boolean isSameTableName(String tableName_Prod, String tableName_Dev) {
+		boolean isSameTableName = false;
+		isSameTableName = tableName_Prod.equals(tableName_Dev);
+		return isSameTableName;
 	}
 	
 	boolean isSameFileName(Path filename_prod, Path filename_dev) {
