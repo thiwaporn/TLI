@@ -22,6 +22,18 @@ public class ValidateSchema {
 	// Data Type 
 	MasicFieldType msFieldType_Prod = null;
 	MasicFieldType msFieldType_Dev = null;
+	
+	// Field Length
+	String msFieldLength_Prod = null;
+	String msFieldLength_Dev = null;
+	
+	// Field Scale
+	String msFieldScale_Prod = null;
+	String msFieldScale_Dev = null;
+	
+	// Field Comment
+	String msFieldComment_Prod = null;
+	String msFieldComment_Dev = null;
 			
 	// Primary Key
 	MasicKey msKey_Prod = null;
@@ -30,6 +42,13 @@ public class ValidateSchema {
 	// Table Count
 	int tableCount_Prod = 0;
 	int tableCount_Dev = 0;
+	
+	// Field Count
+	int fieldCount_Prod = 0;
+	int fieldCount_Dev = 0;		
+	
+	// Pattern Information
+	String[] data;
 
 	public ValidateSchema(String prod, String dev) throws Exception{
 		// TODO Auto-generated constructor stub
@@ -102,13 +121,28 @@ public class ValidateSchema {
 		
 		tableCount_Prod = msSch_Prod.getTableCount();
 		
-		for(int i = 0 ; i < tableCount_Prod ; i++) {
-			msTb_Prod = msSch_Prod.getTableAt(i);
+		for(int t = 0 ; t < tableCount_Prod ; t++) {
+			msTb_Prod = msSch_Prod.getTableAt(t);
 			msTb_Dev = msSch_Dev.getTableByPath(msTb_Prod.getTablePath());
 			
-			// ADD TABLE
-			if(msTb_Dev == null) System.out.println("ADD TABLE : " + msTb_Prod.getTableName());
+			fieldCount_Prod = msTb_Prod.getFieldCount();
 			
+			// DROP TABLE
+			if(msTb_Dev == null) System.out.println("DROP TABLE | " + msTb_Prod.getTableName());
+			
+			// Test Add Drop Field
+			if(msTb_Prod.getTableName().equals("beneficiary####")) {
+				System.out.println("Yes Production : beneficiary####");
+				
+				for(int f = 0 ; f < fieldCount_Prod ; f++) {
+					msField_Prod = msTb_Prod.getFieldAt(f);
+					msField_Dev = msTb_Dev.getField(msField_Prod.getFieldName());
+					
+					// DROP FIELD
+					if(msField_Dev == null) System.out.println("DROP Field | " + msField_Prod.getFieldName());
+					
+				}
+			}
 		}
 	}
 	
@@ -118,14 +152,91 @@ public class ValidateSchema {
 		
 		tableCount_Dev = msSch_Dev.getTableCount();
 		
-		for(int i = 0 ; i < tableCount_Dev ; i++) {
-			msTb_Dev = msSch_Dev.getTableAt(i);
+		for(int t = 0 ; t < tableCount_Dev ; t++) {
+			msTb_Dev = msSch_Dev.getTableAt(t);
 			msTb_Prod = msSch_Prod.getTableByPath(msTb_Dev.getTablePath());
 			
-			// DROP TABLE
-			if(msTb_Prod == null) System.out.println("DROP TABLE : " + msTb_Dev.getTableName());
+			fieldCount_Dev = msTb_Dev.getFieldCount();
+			
+			// ADD TABLE
+			if(msTb_Prod == null) System.out.println("ADD TABLE | " + msTb_Dev.getTableName());
+			
+			// Test Add Drop Field
+			if(msTb_Dev.getTableName().equals("beneficiary####")) {
+				System.out.println("Yes Develop : beneficiary####");
+				
+				for(int f = 0 ; f < fieldCount_Dev ; f++) {
+					msField_Dev = msTb_Dev.getFieldAt(f);
+					msField_Prod = msTb_Prod.getField(msField_Dev.getFieldName());
+					
+					msFieldType_Dev = msField_Dev.getType();
+					msFieldLength_Dev = convertIntegerToString(msField_Dev.getLength());
+					msFieldScale_Dev = convertIntegerToString(msField_Dev.getScale());
+					msFieldComment_Dev = msField_Dev.getComment();
+					
+					// ADD FIELD
+					if(msField_Prod == null) {
+						data = new String[] {"ADD",
+								 msSch_Dev.getSchemaName(),
+								 msTb_Dev.getTableName(),
+								 msField_Dev.getFieldName(),
+								 msFieldType_Dev.name(),
+								 msFieldLength_Dev,
+								 msFieldScale_Dev,
+								 msFieldComment_Dev};
+						System.out.println(textFieldPattern(data));
+					}
+				}
+			}
 		}
 	}
+	
+	String textFieldPattern(String[] data) {
+		
+		String pattern = "";
+		String operType = "";
+		String schemaName = "";
+		String tableName = "";
+		String fieldName = "";
+		String dataType = "";
+		String length = "";
+		String scale = "";
+		String comment = "";
+		
+		operType = data[0].trim();
+		schemaName = data[1].trim();
+		tableName = data[2].trim();
+		fieldName = data[3].trim();
+		dataType = data[4].trim();
+		length = data[5].trim();
+		scale = data[6].trim();
+		comment = data[7].trim();
+
+		// Pattern : ADD/ALTER FIELD | SCHEMA_NAME | TABLE_NAME | FIELD_NAME | DATA_TYPE | LENGTH | SCALE | COMMENT
+		if(operType.equals("ADD")) {
+			
+			pattern = "ADD FIELD|" + schemaName + "|" + tableName + "|" + fieldName + "|" + 
+					dataType + "|" + length + "|" + scale + "|" + comment;
+			System.out.println(pattern);
+			
+		}else if(operType.equals("ALTER")){
+			
+			pattern = "ALTER FIELD|" + schemaName + "|" + tableName + "|" + fieldName + "|" + 
+					dataType + "|" + length + "|" + scale + "|" + comment;
+			System.out.println(pattern);
+			
+		}else {
+			pattern = "";
+		}
+			
+		return pattern;
+	}
+	
+	String convertIntegerToString(int value) {
+		return Integer.toString(value);
+	}
+	
+	
 	
 	boolean isSameFileName(Path filename_prod, Path filename_dev) {
 		boolean isSameFileName = false;
