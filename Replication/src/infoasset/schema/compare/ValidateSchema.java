@@ -142,8 +142,31 @@ public class ValidateSchema {
 						msTb_Prod.getComment()};
 				
 				System.out.println(textTablePattern(data));
+				
+				for(int f = 0 ; f < fieldCount_Prod ; f++) {
+					msField_Prod = msTb_Prod.getFieldAt(f);
+						
+					msFieldType_Prod = msField_Prod.getType();
+					msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
+					msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
+					msFieldComment_Prod = msField_Prod.getComment();
+						
+					// DROP FIELD
+					data = new String[] {"DROP",
+						msSch_Prod.getSchemaName(),
+						msTb_Prod.getTableName(),
+						msTb_Prod.getTablePath(),
+						msField_Prod.getFieldName(),
+						msFieldType_Prod.name(),
+						msFieldLength_Prod,
+						msFieldScale_Prod,
+						msFieldComment_Prod};
+						
+					System.out.println(textFieldPattern(data));
+					
+				}
 			}
-			
+			/*
 			for(int f = 0 ; f < fieldCount_Prod ; f++) {
 				msField_Prod = msTb_Prod.getFieldAt(f);
 				msField_Dev = msTb_Dev.getField(msField_Prod.getFieldName());
@@ -168,6 +191,7 @@ public class ValidateSchema {
 					System.out.println(textFieldPattern(data));
 				}
 			}
+			*/
 		}
 	}
 	
@@ -299,15 +323,15 @@ public class ValidateSchema {
 		tablePath = data[3];
 		comment = data[4];
 		
-		// Pattern : ADD/DROP/RENAME TABLE | SCHEMA_NAME | TABLE_NAME | PATH_TABLE|  |  |  |  | COMMENT
+		// Pattern : ADD/DROP/RENAME | TABLE | SCHEMA_NAME | TABLE_NAME | PATH_TABLE|  |  |  |  | COMMENT
 		if(operType.equals("ADD")) {
-			pattern = "ADD TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
+			pattern = "ADD" + "|TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
 					" " + "|" + " " + "|" + " " + "|" + comment;
 		}else if(operType.equals("DROP")) {
-			pattern = "DROP TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
+			pattern = "DROP" + "|TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
 					" " + "|" + " " + "|" + " " + "|" + comment;
 		}else if(operType.equals("RENAME")) {
-			pattern = "RENAME TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
+			pattern = "RENAME" + "|TABLE|" + schemaName + "|" + tableName + "|" + tablePath + "|" + " " + "|" + 
 					" " + "|" + " " + "|" + " " + "|" + comment;
 		}
 		
@@ -337,22 +361,38 @@ public class ValidateSchema {
 		scale = data[7].trim();
 		comment = data[8].trim();
 
-		// Pattern : ADD/ALTER/DROP FIELD | SCHEMA_NAME | TABLE_NAME | PATH_TABLE| FIELD_NAME | DATA_TYPE | LENGTH | SCALE | COMMENT
+		// Pattern : ADD/ALTER/DROP | FIELD | SCHEMA_NAME | TABLE_NAME | PATH_TABLE| FIELD_NAME | DATA_TYPE | LENGTH | SCALE | COMMENT
 		if(operType.equals("ADD")) {
 			
-			pattern = "ADD FIELD|" + schemaName + "|" + tableName + "|" + tablePath + "|" + fieldName + "|" + 
+			pattern = "ADD" + "|FIELD|" + schemaName + "|" + tableName + "|" + tablePath + "|" + fieldName + "|" + 
 					dataType + "|" + length + "|" + scale + "|" + comment;
 		}else if(operType.equals("ALTER")){
 			
-			pattern = "ALTER FIELD|" + schemaName + "|" + tableName + "|"+ tablePath + "|" + fieldName + "|" + 
+			pattern = "ALTER" + "|FIELD|" + schemaName + "|" + tableName + "|"+ tablePath + "|" + fieldName + "|" + 
 					dataType + "|" + length + "|" + scale + "|" + comment;
 		}else if(operType.equals("DROP")){
 			
-			pattern = "DROP FIELD|" + schemaName + "|" + tableName + "|"+ tablePath + "|" + fieldName + "|" + 
+			pattern = "DROP" + "|FIELD|" + schemaName + "|" + tableName + "|"+ tablePath + "|" + fieldName + "|" + 
 					dataType + "|" + length + "|" + scale + "|" + comment;
 		}
 			
 		return pattern;
+	}
+	
+	boolean exportData() {
+		boolean isWrite = false;
+		
+		for(String data : dataList) {
+			System.out.println(data);
+		}
+		
+		return isWrite;
+	}
+	
+	void getData() {
+			for(String data : dataList) {
+				System.out.println(data);
+			}
 	}
 	
 	String convertIntegerToString(int value) {
