@@ -124,9 +124,10 @@ public class ValidateSchema {
 			System.out.println("-- Let's go to Check Change Structure --");
 			checkChangeStructureProduction(file_prod, file_dev);
 			checkChangeStructureDevelop(file_prod, file_dev);
-			getData();
 			
-			if(isCSV && destPathCSV != "") {
+			
+			if(isCSV == true && destPathCSV != "") {
+				getData();
 				Path pathDest = Paths.get(destPathCSV);
 				if(isDirectoryExists(pathDest)) {
 					LocalDateTime now = LocalDateTime.now();
@@ -138,8 +139,10 @@ public class ValidateSchema {
 						System.out.println("Unsuccessful Write CSV File");
 					}
 				}
-			}else if(isCSV && destPathCSV == "") {
+			}else if(isCSV == true && destPathCSV == "") {
 				System.out.println("-- Please specific destination CSV File --");
+			}else {
+				getData();
 			}
 			
 			System.out.println("-- Finish Program --");
