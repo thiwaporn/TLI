@@ -130,9 +130,8 @@ public class ValidateSchema {
 			}
 			
 			System.out.println("-- Let's go to Check Change Structure --");
-			checkChangeStructureProduction(file_prod, file_dev);
 			checkChangeStructureDevelop(file_prod, file_dev);
-			
+			checkChangeStructureProduction(file_prod, file_dev);
 			
 			if(isCSV == true && destPathCSV != "") {
 				getData();
@@ -155,107 +154,6 @@ public class ValidateSchema {
 			
 			System.out.println("-- Finish Program --");
 			break;
-		}
-	}
-	
-	void checkChangeStructureProduction(File file_prod, File file_dev) throws Exception{
-		msSch_Prod = SchemaCompiler.getSchema(file_prod);
-		msSch_Dev = SchemaCompiler.getSchema(file_dev);
-		
-		tableCount_Prod = msSch_Prod.getTableCount();
-		
-		for(int t = 0 ; t < tableCount_Prod ; t++) {
-			msTb_Prod = msSch_Prod.getTableAt(t);
-			msTb_Dev = msSch_Dev.getTableByPath(msTb_Prod.getTablePath());
-			
-			fieldCount_Prod = msTb_Prod.getFieldCount();
-			keyCount_Prod = msTb_Prod.getKeyCount();
-			
-			// DROP TABLE
-			if(msTb_Dev == null) {
-				data = new String[] {"DROP",
-						msSch_Prod.getSchemaName(),
-						msTb_Prod.getTableName(),
-						msTb_Prod.getTablePath(),
-						msTb_Prod.getComment()};
-				
-				dataList.add(textTablePattern(data));
-				
-				for(int f = 0 ; f < fieldCount_Prod ; f++) {
-					msField_Prod = msTb_Prod.getFieldAt(f);
-						
-					msFieldType_Prod = msField_Prod.getType();
-					msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
-					msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
-					msFieldComment_Prod = msField_Prod.getComment();
-						
-					// DROP FIELD
-					data = new String[] {"DROP",
-						msSch_Prod.getSchemaName(),
-						msTb_Prod.getTableName(),
-						msTb_Prod.getTablePath(),
-						msField_Prod.getFieldName(),
-						msFieldType_Prod.name(),
-						msFieldLength_Prod,
-						msFieldScale_Prod,
-						msFieldComment_Prod};
-					
-					dataList.add(textFieldPattern(data));
-					
-				}
-				
-				for(int k = 0 ; k < keyCount_Prod ; k++) {
-					msKey_Prod = msTb_Prod.getKeyAt(k);
-					segmentCount_Prod = msKey_Prod.getSegmentCount();
-					
-					String strFieldName = "";
-					for(int s = 0 ; s < segmentCount_Prod ; s++) {
-						if((s+1) == segmentCount_Prod) {
-							strFieldName += msKey_Prod.getFieldAt(s).getFieldName();
-						}else {
-							strFieldName += msKey_Prod.getFieldAt(s).getFieldName() + ",";
-						}
-						
-					}
-					
-					// DROP KEY
-					data = new String[] {"DROP",
-						msSch_Prod.getSchemaName(),
-						msTb_Prod.getTableName(),
-						msTb_Prod.getTablePath(),
-						propertyKey(msKey_Prod.isDuplicate(), msKey_Prod.isModify()),
-						strFieldName};
-					
-					dataList.add(textKeyPattern(data));
-
-				}
-			}
-			
-			if(msTb_Dev != null) {
-				for(int f = 0 ; f < fieldCount_Prod ; f++) {
-					msField_Prod = msTb_Prod.getFieldAt(f);
-					msField_Dev = msTb_Dev.getField(msField_Prod.getFieldName());
-						
-					msFieldType_Prod = msField_Prod.getType();
-					msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
-					msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
-					msFieldComment_Prod = msField_Prod.getComment();
-						
-					// DROP FIELD
-					if(msField_Dev == null) {
-						data = new String[] {"DROP",
-							msSch_Prod.getSchemaName(),
-							msTb_Prod.getTableName(),
-							msTb_Prod.getTablePath(),
-							msField_Prod.getFieldName(),
-							msFieldType_Prod.name(),
-							msFieldLength_Prod,
-							msFieldScale_Prod,
-							msFieldComment_Prod};
-						dataList.add(textFieldPattern(data));
-					}
-				}
-			}
 		}
 	}
 	
@@ -331,7 +229,7 @@ public class ValidateSchema {
 						strFieldName};
 					
 					dataList.add(textKeyPattern(data));
-
+	
 				}
 			} 
 			
@@ -435,7 +333,7 @@ public class ValidateSchema {
 							strFieldName};
 						
 						dataList.add(textKeyPattern(data));
-
+	
 					}
 				}else if(keyCount_Prod != keyCount_Dev) {
 					for(int k = 0 ; k < keyCount_Dev ; k++) {
@@ -461,10 +359,111 @@ public class ValidateSchema {
 							strFieldName};
 						
 						dataList.add(textKeyPattern(data));
-
+	
 					}
 				}
 				
+			}
+		}
+	}
+
+	void checkChangeStructureProduction(File file_prod, File file_dev) throws Exception{
+		msSch_Prod = SchemaCompiler.getSchema(file_prod);
+		msSch_Dev = SchemaCompiler.getSchema(file_dev);
+		
+		tableCount_Prod = msSch_Prod.getTableCount();
+		
+		for(int t = 0 ; t < tableCount_Prod ; t++) {
+			msTb_Prod = msSch_Prod.getTableAt(t);
+			msTb_Dev = msSch_Dev.getTableByPath(msTb_Prod.getTablePath());
+			
+			fieldCount_Prod = msTb_Prod.getFieldCount();
+			keyCount_Prod = msTb_Prod.getKeyCount();
+			
+			// DROP TABLE
+			if(msTb_Dev == null) {
+				data = new String[] {"DROP",
+						msSch_Prod.getSchemaName(),
+						msTb_Prod.getTableName(),
+						msTb_Prod.getTablePath(),
+						msTb_Prod.getComment()};
+				
+				dataList.add(textTablePattern(data));
+				
+				for(int f = 0 ; f < fieldCount_Prod ; f++) {
+					msField_Prod = msTb_Prod.getFieldAt(f);
+						
+					msFieldType_Prod = msField_Prod.getType();
+					msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
+					msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
+					msFieldComment_Prod = msField_Prod.getComment();
+						
+					// DROP FIELD
+					data = new String[] {"DROP",
+						msSch_Prod.getSchemaName(),
+						msTb_Prod.getTableName(),
+						msTb_Prod.getTablePath(),
+						msField_Prod.getFieldName(),
+						msFieldType_Prod.name(),
+						msFieldLength_Prod,
+						msFieldScale_Prod,
+						msFieldComment_Prod};
+					
+					dataList.add(textFieldPattern(data));
+					
+				}
+				
+				for(int k = 0 ; k < keyCount_Prod ; k++) {
+					msKey_Prod = msTb_Prod.getKeyAt(k);
+					segmentCount_Prod = msKey_Prod.getSegmentCount();
+					
+					String strFieldName = "";
+					for(int s = 0 ; s < segmentCount_Prod ; s++) {
+						if((s+1) == segmentCount_Prod) {
+							strFieldName += msKey_Prod.getFieldAt(s).getFieldName();
+						}else {
+							strFieldName += msKey_Prod.getFieldAt(s).getFieldName() + ",";
+						}
+						
+					}
+					
+					// DROP KEY
+					data = new String[] {"DROP",
+						msSch_Prod.getSchemaName(),
+						msTb_Prod.getTableName(),
+						msTb_Prod.getTablePath(),
+						propertyKey(msKey_Prod.isDuplicate(), msKey_Prod.isModify()),
+						strFieldName};
+					
+					dataList.add(textKeyPattern(data));
+
+				}
+			}
+			
+			if(msTb_Dev != null) {
+				for(int f = 0 ; f < fieldCount_Prod ; f++) {
+					msField_Prod = msTb_Prod.getFieldAt(f);
+					msField_Dev = msTb_Dev.getField(msField_Prod.getFieldName());
+						
+					msFieldType_Prod = msField_Prod.getType();
+					msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
+					msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
+					msFieldComment_Prod = msField_Prod.getComment();
+						
+					// DROP FIELD
+					if(msField_Dev == null) {
+						data = new String[] {"DROP",
+							msSch_Prod.getSchemaName(),
+							msTb_Prod.getTableName(),
+							msTb_Prod.getTablePath(),
+							msField_Prod.getFieldName(),
+							msFieldType_Prod.name(),
+							msFieldLength_Prod,
+							msFieldScale_Prod,
+							msFieldComment_Prod};
+						dataList.add(textFieldPattern(data));
+					}
+				}
 			}
 		}
 	}
