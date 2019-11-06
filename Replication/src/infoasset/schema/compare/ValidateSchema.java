@@ -126,22 +126,19 @@ public class ValidateSchema {
 			checkChangeStructureDevelop(file_prod, file_dev);
 			getData();
 			
-			if(isCSV == true && destPathCSV != "") {
+			if(isCSV && destPathCSV != "") {
 				Path pathDest = Paths.get(destPathCSV);
-				
-				Files.isDirectory(pathDest);
-				
-				LocalDateTime now = LocalDateTime.now();
-				filenameCSV = msSch_Dev.getSchemaName() + "_" + dtf.format(now) + ".csv";
-				path_to_csv = destPathCSV + "/" + filenameCSV;
-				
-				if(writeFile()) {
-					
-					System.out.println("Write CSV File : " + path_to_csv); // เติมชื่อไฟล์
-				}else {
-					System.out.println("Unsuccessful write CSV File");
+				if(isDirectoryExists(pathDest)) {
+					LocalDateTime now = LocalDateTime.now();
+					filenameCSV = msSch_Dev.getSchemaName() + "_" + dtf.format(now) + ".csv";
+					path_to_csv = destPathCSV + "/" + filenameCSV;
+					if(writeFile()) {
+						System.out.println("Write CSV File : " + path_to_csv); // เติมชื่อไฟล์
+					}else {
+						System.out.println("Unsuccessful Write CSV File");
+					}
 				}
-			}else if(isCSV == true && destPathCSV == "") {
+			}else if(isCSV && destPathCSV == "") {
 				System.out.println("-- Please specific destination CSV File --");
 			}
 			
@@ -195,32 +192,32 @@ public class ValidateSchema {
 					
 				}
 			}
-			/*
-			for(int f = 0 ; f < fieldCount_Prod ; f++) {
-				msField_Prod = msTb_Prod.getFieldAt(f);
-				msField_Dev = msTb_Dev.getField(msField_Prod.getFieldName());
-					
-				msFieldType_Prod = msField_Prod.getType();
-				msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
-				msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
-				msFieldComment_Prod = msField_Prod.getComment();
-					
-				// DROP FIELD
-				if(msField_Dev == null) {
-					data = new String[] {"DROP",
-						msSch_Prod.getSchemaName(),
-						msTb_Prod.getTableName(),
-						msTb_Prod.getTablePath(),
-						msField_Prod.getFieldName(),
-						msFieldType_Prod.name(),
-						msFieldLength_Prod,
-						msFieldScale_Prod,
-						msFieldComment_Prod};
-					
-					System.out.println(textFieldPattern(data));
+			
+			if(msTb_Dev != null) {
+				for(int f = 0 ; f < fieldCount_Prod ; f++) {
+					msField_Prod = msTb_Prod.getFieldAt(f);
+					msField_Dev = msTb_Dev.getField(msField_Prod.getFieldName());
+						
+					msFieldType_Prod = msField_Prod.getType();
+					msFieldLength_Prod = convertIntegerToString(msField_Prod.getLength());
+					msFieldScale_Prod = convertIntegerToString(msField_Prod.getScale());
+					msFieldComment_Prod = msField_Prod.getComment();
+						
+					// DROP FIELD
+					if(msField_Dev == null) {
+						data = new String[] {"DROP",
+							msSch_Prod.getSchemaName(),
+							msTb_Prod.getTableName(),
+							msTb_Prod.getTablePath(),
+							msField_Prod.getFieldName(),
+							msFieldType_Prod.name(),
+							msFieldLength_Prod,
+							msFieldScale_Prod,
+							msFieldComment_Prod};
+						dataList.add(textFieldPattern(data));
+					}
 				}
 			}
-			*/
 		}
 	}
 	
@@ -418,7 +415,8 @@ public class ValidateSchema {
 			write.write(data + "\n");
 		}
 		write.close();
-		isWrite = true;
+		
+		isWrite = isFilesExists(Paths.get(path_to_csv));
 		
 		return isWrite;
 	}
@@ -471,9 +469,15 @@ public class ValidateSchema {
 	}
 	
 	boolean isFilesExists(Path path) {
-		boolean pathExists = false;
-		pathExists = Files.exists(path, new LinkOption[] {LinkOption.NOFOLLOW_LINKS});
-		return pathExists;
+		boolean pathFileExists = false;
+		pathFileExists = Files.exists(path, new LinkOption[] {LinkOption.NOFOLLOW_LINKS});
+		return pathFileExists;
+	}
+	
+	boolean isDirectoryExists(Path path) {
+		boolean pathDirectoryExists = false;
+		pathDirectoryExists = Files.exists(path, new LinkOption[] {LinkOption.NOFOLLOW_LINKS});
+		return pathDirectoryExists;
 	}
 	
 	boolean isExtensionSch(Path path) {
