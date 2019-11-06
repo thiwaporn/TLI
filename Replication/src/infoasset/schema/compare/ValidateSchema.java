@@ -304,16 +304,97 @@ public class ValidateSchema {
 						segmentCount_Dev = msKey_Dev.getSegmentCount();
 						segmentCount_Prod = msKey_Prod.getSegmentCount();
 						
-						if(segmentCount_Prod == segmentCount_Dev) {
+						if( (segmentCount_Prod == segmentCount_Dev) && 
+								isSameKey(msKey_Prod.toString(), msKey_Dev.toString()) == false) {
 							
-						}else if(segmentCount_Prod != segmentCount_Dev) {
+							String strFieldName_Prod = "";
+							for(int s = 0 ; s < segmentCount_Prod ; s++) {
+								if((s+1) == segmentCount_Prod) {
+									strFieldName_Prod += msKey_Prod.getFieldAt(s).getFieldName();
+								}else {
+									strFieldName_Prod += msKey_Prod.getFieldAt(s).getFieldName() + ",";
+								}
+								
+							}
+							
+							// DROP KEY PROD
+							data = new String[] {"DROP",
+								msSch_Prod.getSchemaName(),
+								msTb_Prod.getTableName(),
+								msTb_Prod.getTablePath(),
+								propertyKey(msKey_Prod.isDuplicate(), msKey_Prod.isModify()),
+								strFieldName_Prod};
+							
+							dataList.add(textKeyPattern(data));
+							
+							
+							String strFieldName_Dev = "";
+							for(int s = 0 ; s < segmentCount_Dev ; s++) {
+								if((s+1) == segmentCount_Dev) {
+									strFieldName_Dev += msKey_Dev.getFieldAt(s).getFieldName();
+								}else {
+									strFieldName_Dev += msKey_Dev.getFieldAt(s).getFieldName() + ",";
+								}
+								
+							}
+							
+							// ADD KEY DEV
+							data = new String[] {"ADD",
+								msSch_Dev.getSchemaName(),
+								msTb_Dev.getTableName(),
+								msTb_Dev.getTablePath(),
+								propertyKey(msKey_Dev.isDuplicate(), msKey_Dev.isModify()),
+								strFieldName_Dev};
+							
+							dataList.add(textKeyPattern(data));
+							
+						}else if( (segmentCount_Prod != segmentCount_Dev) && 
+								isSameKey(msKey_Prod.toString(), msKey_Dev.toString()) == false) {
+							
+							String strFieldName_Prod = "";
+							for(int s = 0 ; s < segmentCount_Prod ; s++) {
+								if((s+1) == segmentCount_Prod) {
+									strFieldName_Prod += msKey_Prod.getFieldAt(s).getFieldName();
+								}else {
+									strFieldName_Prod += msKey_Prod.getFieldAt(s).getFieldName() + ",";
+								}
+								
+							}
+							
+							// DROP KEY PROD
+							data = new String[] {"DROP",
+								msSch_Prod.getSchemaName(),
+								msTb_Prod.getTableName(),
+								msTb_Prod.getTablePath(),
+								propertyKey(msKey_Prod.isDuplicate(), msKey_Prod.isModify()),
+								strFieldName_Prod};
+							
+							dataList.add(textKeyPattern(data));
+							
+							
+							String strFieldName_Dev = "";
+							for(int s = 0 ; s < segmentCount_Dev ; s++) {
+								if((s+1) == segmentCount_Dev) {
+									strFieldName_Dev += msKey_Dev.getFieldAt(s).getFieldName();
+								}else {
+									strFieldName_Dev += msKey_Dev.getFieldAt(s).getFieldName() + ",";
+								}
+								
+							}
+							
+							// ADD KEY DEV
+							data = new String[] {"ADD",
+								msSch_Dev.getSchemaName(),
+								msTb_Dev.getTableName(),
+								msTb_Dev.getTablePath(),
+								propertyKey(msKey_Dev.isDuplicate(), msKey_Dev.isModify()),
+								strFieldName_Dev};
+							
+							dataList.add(textKeyPattern(data));
 							
 						}
 						
-						
-						
-						
-						
+						/*
 						String strFieldName = "";
 						for(int s = 0 ; s < segmentCount_Dev ; s++) {
 							if((s+1) == segmentCount_Dev) {
@@ -333,6 +414,7 @@ public class ValidateSchema {
 							strFieldName};
 						
 						dataList.add(textKeyPattern(data));
+						*/
 	
 					}
 				}else if(keyCount_Prod != keyCount_Dev) {
@@ -623,10 +705,10 @@ public class ValidateSchema {
 		return Integer.toString(value);
 	}
 	
-	boolean isSamePropertyKey(boolean isKey_Prod, boolean isKey_Dev) {
-		boolean isSamePropertyKey = false;
-		isSamePropertyKey = (isKey_Prod == isKey_Dev);
-		return isSamePropertyKey;
+	boolean isSameKey(String key_Prod, String key_Dev) {
+		boolean isSameKey = false;
+		isSameKey = key_Prod.equals(key_Dev);
+		return isSameKey;
 	}
 	
 	boolean isSameFieldType(String fieldType_Prod, String fieldType_Dev) {
