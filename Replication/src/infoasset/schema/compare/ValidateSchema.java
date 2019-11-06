@@ -398,10 +398,71 @@ public class ValidateSchema {
 					}
 				}
 				
-				if(keyCount_Prod != keyCount_Dev) {
-					
-				}else if(keyCount_Prod == keyCount_Dev) {
-					
+				if(keyCount_Prod == keyCount_Dev) {
+					for(int k = 0 ; k < keyCount_Dev ; k++) {
+						msKey_Dev = msTb_Dev.getKeyAt(k);
+						msKey_Prod = msTb_Prod.getKeyAt(k);
+						
+						segmentCount_Dev = msKey_Dev.getSegmentCount();
+						segmentCount_Prod = msKey_Prod.getSegmentCount();
+						
+						if(segmentCount_Prod == segmentCount_Dev) {
+							
+						}else if(segmentCount_Prod != segmentCount_Dev) {
+							
+						}
+						
+						
+						
+						
+						
+						String strFieldName = "";
+						for(int s = 0 ; s < segmentCount_Dev ; s++) {
+							if((s+1) == segmentCount_Dev) {
+								strFieldName += msKey_Dev.getFieldAt(s).getFieldName();
+							}else {
+								strFieldName += msKey_Dev.getFieldAt(s).getFieldName() + ",";
+							}
+							
+						}
+						
+						// ADD KEY
+						data = new String[] {"ADD",
+							msSch_Dev.getSchemaName(),
+							msTb_Dev.getTableName(),
+							msTb_Dev.getTablePath(),
+							propertyKey(msKey_Dev.isDuplicate(), msKey_Dev.isModify()),
+							strFieldName};
+						
+						dataList.add(textKeyPattern(data));
+
+					}
+				}else if(keyCount_Prod != keyCount_Dev) {
+					for(int k = 0 ; k < keyCount_Dev ; k++) {
+						msKey_Dev = msTb_Dev.getKeyAt(k);
+						segmentCount_Dev = msKey_Dev.getSegmentCount();
+						
+						String strFieldName = "";
+						for(int s = 0 ; s < segmentCount_Dev ; s++) {
+							if((s+1) == segmentCount_Dev) {
+								strFieldName += msKey_Dev.getFieldAt(s).getFieldName();
+							}else {
+								strFieldName += msKey_Dev.getFieldAt(s).getFieldName() + ",";
+							}
+							
+						}
+						
+						// ADD KEY
+						data = new String[] {"ADD",
+							msSch_Dev.getSchemaName(),
+							msTb_Dev.getTableName(),
+							msTb_Dev.getTablePath(),
+							propertyKey(msKey_Dev.isDuplicate(), msKey_Dev.isModify()),
+							strFieldName};
+						
+						dataList.add(textKeyPattern(data));
+
+					}
 				}
 				
 			}
@@ -563,6 +624,12 @@ public class ValidateSchema {
 		return Integer.toString(value);
 	}
 	
+	boolean isSamePropertyKey(boolean isKey_Prod, boolean isKey_Dev) {
+		boolean isSamePropertyKey = false;
+		isSamePropertyKey = (isKey_Prod == isKey_Dev);
+		return isSamePropertyKey;
+	}
+	
 	boolean isSameFieldType(String fieldType_Prod, String fieldType_Dev) {
 		boolean isSameFieldType = false;
 		isSameFieldType = fieldType_Prod.equals(fieldType_Dev);
@@ -579,6 +646,12 @@ public class ValidateSchema {
 		boolean isSameFieldScale = false;
 		isSameFieldScale = fieldScale_Prod.equals(fieldScale_Dev);
 		return isSameFieldScale;
+	}
+	
+	boolean isSameFieldName(String fieldName_Prod, String fieldName_Dev) {
+		boolean isSameFieldName = false;
+		isSameFieldName = fieldName_Prod.equals(fieldName_Dev);
+		return isSameFieldName;
 	}
 	
 	boolean isSameTableName(String tableName_Prod, String tableName_Dev) {
