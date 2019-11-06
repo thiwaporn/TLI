@@ -127,6 +127,10 @@ public class ValidateSchema {
 			getData();
 			
 			if(isCSV == true && destPathCSV != "") {
+				Path pathDest = Paths.get(destPathCSV);
+				
+				Files.isDirectory(pathDest);
+				
 				LocalDateTime now = LocalDateTime.now();
 				filenameCSV = msSch_Dev.getSchemaName() + "_" + dtf.format(now) + ".csv";
 				path_to_csv = destPathCSV + "/" + filenameCSV;
