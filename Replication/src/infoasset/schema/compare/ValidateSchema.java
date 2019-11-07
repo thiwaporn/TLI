@@ -10,8 +10,6 @@ import infoasset.schema.*;
 
 public class ValidateSchema {
 	
-	private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
-	
 	String destPathCSV = "";
 	String filenameCSV = "";
 	String path_to_csv = "";
@@ -73,7 +71,7 @@ public class ValidateSchema {
 	// Export CSV
 	ArrayList<String> dataList = new ArrayList<String>();
 	
-	public ValidateSchema(String prod, String dev, boolean isCSV, String destPathCSV) throws Exception{
+	public ValidateSchema(String prod, String dev, boolean isCSV, String destPathCSV, int reqID) throws Exception{
 		// TODO Auto-generated constructor stub
 		Path path_prod = Paths.get(prod);
 		Path path_dev = Paths.get(dev);
@@ -83,76 +81,79 @@ public class ValidateSchema {
 		File file_prod = path_prod.toFile();
 		File file_dev = path_dev.toFile();
 		
-		System.out.println("Path to schema production : " + path_prod);
-		System.out.println("Path to schema develop : " + path_dev);
+		System.out.println("PATH TO SCHEMA PRODUCTION : " + path_prod);
+		System.out.println("PATH TO SCHEMA DEVELOP : " + path_dev);
 		
 		while(true) {
 			
 			// Check File Exists 
 			if (isFilesExists(path_prod)) 
 			{
-				System.out.println("File Exists : " + path_prod);
+				System.out.println("SCHEMA FILE PRODUCTION EXISTS : " + path_prod);
 			}else {
-				System.out.println("Not Found Schema Production : " + filename_prod);
+				System.out.println("NOT FOUND SCHEMA PRODUCTION : " + filename_prod);
 				break;
 			}
 			
 			if (isFilesExists(path_dev)) 
 			{
-				System.out.println("File Exists : " + path_dev);
+				System.out.println("SCHEMA FILE DEVELOP EXISTS : " + path_dev);
 			}else {
-				System.out.println("Not Found Schema Develop : " + filename_dev);
+				System.out.println("NOT FOUND SCHEMA DEVELOP : " + filename_dev);
 				break;
 			}
 			
 			// Check Extension .sch
 			if (isExtensionSch(path_prod)) 
 			{
-				System.out.println("Schema Production is extension .sch : " + path_prod);
+				System.out.println("SCHEMA PRODUCTION IS EXTENSION .sch : " + path_prod);
 			}else {
-				System.out.println("Not Extension .sch : " + filename_prod);
+				System.out.println("NOT EXTENSION .sch : " + filename_prod);
 				break;
 			}
 			
 			if (isExtensionSch(path_dev)) 
 			{
-				System.out.println("Schema Develop is extension .sch : " + path_dev);
+				System.out.println("SCHEMA DEVELOP IS EXTENSION .sch : " + path_dev);
 			}else {
-				System.out.println("Not Extension .sch : " + filename_dev);
+				System.out.println("NOT EXTENSION .sch : " + filename_dev);
 				break;
 			}
 			
 			if(isSameFileName(filename_prod, filename_dev)) {
-				System.out.println("Schema same name ");
+				System.out.println("SCHEMA SAME NAME");
 			}else {
-				System.out.println("Schema name different");
+				System.out.println("SCHEMA NAME DIFFERENT");
 				break;
 			}
 			
-			System.out.println("-- Let's go to Check Change Structure --");
+			System.out.println("-- LET'S GO TO CHECK CHANGE STRUCTURE --");
 			checkChangeStructureDevelop(file_prod, file_dev);
 			checkChangeStructureProduction(file_prod, file_dev);
 			
-			if(isCSV == true && destPathCSV != "") {
+			if(isCSV == true && destPathCSV != "" && reqID != 0) {
 				getData();
 				Path pathDest = Paths.get(destPathCSV);
 				if(isDirectoryExists(pathDest)) {
-					LocalDateTime now = LocalDateTime.now();
-					filenameCSV = msSch_Dev.getSchemaName() + "_" + dtf.format(now) + ".csv";
+					
+					filenameCSV = msSch_Dev.getSchemaName() + "_REQ_" + reqID + ".csv";
 					path_to_csv = destPathCSV + "/" + filenameCSV;
+					
 					if(writeFile()) {
-						System.out.println("Write CSV File : " + path_to_csv); // เติมชื่อไฟล์
+						System.out.println("-- WRITE CSV FILE : " + path_to_csv + " --"); // เติมชื่อไฟล์
 					}else {
-						System.out.println("Unsuccessful Write CSV File");
+						System.out.println("-- UNSUCCESSFUL WRITE CSV FILE --");
 					}
 				}
-			}else if(isCSV == true && destPathCSV == "") {
-				System.out.println("-- Please specific destination CSV File --");
+			}else if(isCSV == true && destPathCSV == "" && reqID == 0) {
+				System.out.println("-- PLEASE SPECIFIC DESTINATION CSV FILE AND REQUEST ID --");
+			}else if(isCSV == true && destPathCSV != "" && reqID == 0) {
+				System.out.println("-- PLEASE SPECIFIC REQUEST ID --");
 			}else {
 				getData();
 			}
 			
-			System.out.println("-- Finish Program --");
+			System.out.println("-- FINISH PROGRAM --");
 			break;
 		}
 	}
@@ -393,30 +394,8 @@ public class ValidateSchema {
 							dataList.add(textKeyPattern(data));
 							
 						}
-						
-						/*
-						String strFieldName = "";
-						for(int s = 0 ; s < segmentCount_Dev ; s++) {
-							if((s+1) == segmentCount_Dev) {
-								strFieldName += msKey_Dev.getFieldAt(s).getFieldName();
-							}else {
-								strFieldName += msKey_Dev.getFieldAt(s).getFieldName() + ",";
-							}
-							
-						}
-						
-						// ADD KEY
-						data = new String[] {"ADD",
-							msSch_Dev.getSchemaName(),
-							msTb_Dev.getTableName(),
-							msTb_Dev.getTablePath(),
-							propertyKey(msKey_Dev.isDuplicate(), msKey_Dev.isModify()),
-							strFieldName};
-						
-						dataList.add(textKeyPattern(data));
-						*/
-	
 					}
+					
 				}else if(keyCount_Prod != keyCount_Dev) {
 					
 					for(int k = 0 ; k < keyCount_Prod ; k++) {
@@ -688,14 +667,14 @@ public class ValidateSchema {
 		File file = new File(path_to_csv); 
 		FileWriter write = new FileWriter(file, false);
 		
-		write.write(title + "\n");
-		for(String data : dataList) {
-			write.write(data + "\n");
+		if(dataList.size() != 0) {
+			write.write(title + "\n");
+			for(String data : dataList) {
+				write.write(data + "\n");
+			}
+			write.close();
+			isWrite = isFilesExists(Paths.get(path_to_csv));
 		}
-		write.close();
-		
-		isWrite = isFilesExists(Paths.get(path_to_csv));
-		
 		return isWrite;
 	}
 	
