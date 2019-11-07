@@ -444,7 +444,6 @@ public class ValidateSchema {
 	
 					}
 				}
-				
 			}
 		}
 	}
