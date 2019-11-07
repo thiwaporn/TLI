@@ -418,8 +418,36 @@ public class ValidateSchema {
 	
 					}
 				}else if(keyCount_Prod != keyCount_Dev) {
+					
+					for(int k = 0 ; k < keyCount_Prod ; k++) {
+						msKey_Prod = msTb_Prod.getKeyAt(k);
+						
+						segmentCount_Prod = msKey_Prod.getSegmentCount();
+						
+						String strFieldName = "";
+						for(int s = 0 ; s < segmentCount_Prod ; s++) {
+							if((s+1) == segmentCount_Prod) {
+								strFieldName += msKey_Prod.getFieldAt(s).getFieldName();
+							}else {
+								strFieldName += msKey_Prod.getFieldAt(s).getFieldName() + ",";
+							}
+							
+						}
+						
+						// ADD KEY
+						data = new String[] {"DROP",
+							msSch_Prod.getSchemaName(),
+							msTb_Prod.getTableName(),
+							msTb_Prod.getTablePath(),
+							propertyKey(msKey_Prod.isDuplicate(), msKey_Prod.isModify()),
+							strFieldName};
+						
+						dataList.add(textKeyPattern(data));
+					}
+					
 					for(int k = 0 ; k < keyCount_Dev ; k++) {
 						msKey_Dev = msTb_Dev.getKeyAt(k);
+						
 						segmentCount_Dev = msKey_Dev.getSegmentCount();
 						
 						String strFieldName = "";
