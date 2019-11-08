@@ -2,8 +2,6 @@ package infoasset.schema.compare;
 
 import java.io.*;
 import java.nio.file.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import infoasset.schema.*;
@@ -171,8 +169,6 @@ public class ValidateSchema {
 			fieldCount_Dev = msTb_Dev.getFieldCount();
 			keyCount_Dev = msTb_Dev.getKeyCount();
 			
-			keyCount_Prod = msTb_Prod.getKeyCount();
-			
 			// ADD TABLE
 			if(msTb_Prod == null) {
 				data = new String[] {"ADD",
@@ -235,6 +231,9 @@ public class ValidateSchema {
 			} 
 			
 			if(msTb_Prod != null) {
+				
+				keyCount_Prod = msTb_Prod.getKeyCount();
+				
 				// RENAME TABLE
 				if(isSameTableName(msTb_Prod.getTableName(), msTb_Dev.getTableName()) == false) {
 					data = new String[] {"RENAME",

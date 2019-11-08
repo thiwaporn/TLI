@@ -36,7 +36,7 @@ public class TestValidateSchema {
 		}
 		
 		System.out.println("--- Test Validate Schema ---");
-		ValidateSchema valid = new ValidateSchema(path_prod, path_dev, true, "/tmp");
+		ValidateSchema valid = new ValidateSchema(path_prod, path_dev, true, "/tmp", 10);
 		
 	}
 	
